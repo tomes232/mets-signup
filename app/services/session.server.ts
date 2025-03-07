@@ -54,9 +54,6 @@ session.set("userId", userId);
 session.set("email", email);
 session.set("name", name);
 
-console.log('session', session.get("email"))
-console.log('session', session.get("name"))
-console.log('session', session.get("userId"))
 return redirect(redirectTo, {
     headers: {
     "Set-Cookie": await sessionStorage.commitSession(session, {

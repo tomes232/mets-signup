@@ -1,6 +1,5 @@
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "~/components/ui/tooltip"
 import { Calendar as UICalendar } from "~/components/ui/calendar"
-import { format, toZonedTime } from "date-fns-tz"
+import {  toZonedTime } from "date-fns-tz"
 
 type Game = {
     date: string
@@ -30,7 +29,7 @@ export default function GameCalendar({date, setDate, data}: {date: Date, setDate
                     className="rounded-md border"
                     modifiers={{ highlighted: highlightedDates }}
                     modifiersStyles={{
-                        highlighted: { backgroundColor: '#90cdf4' }
+                        highlighted: { backgroundColor: '#FFA500' }
                     }}
                 />
             </div>

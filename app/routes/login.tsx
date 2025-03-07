@@ -15,7 +15,6 @@ const supabase = createClient(
         process.env.SUPABASE_ANON_KEY!,
      )
     let { error } = await supabase.auth.signOut()
-    console.log('error', error)
     if (error) {
         return new Response(JSON.stringify({ error: error.message }), { status: 400 });
     }
@@ -31,14 +30,12 @@ export let action = async ({ request }: ActionFunctionArgs) => {
     let formData = await request.formData();
     let email = formData.get('email');
     let password = formData.get('password');
-    console.log('email', email);
-    console.log('password', password);
+
     let { data, error } = await supabase.auth.signUp({
         email: email as string,
         password: password as string
     })
-    console.log('data', data);
-    console.log('error', error);
+
     if (error) {
         return new Response(JSON.stringify({ error: error.message }), { status: 400 });
     }

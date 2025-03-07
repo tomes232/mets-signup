@@ -56,15 +56,14 @@ const columns: ColumnDef<Game>[] = [
         const date = row.getValue("start_time") as Date
         return format(date, "MMM dd, yyyy")
     },
+    sortingFn: "datetime"
     },
     {
     accessorKey: "game_time",
     header: "Time",
     cell: ({ row }) => {
         const time =  row.original.start_time
-        console.log('time', time, row)
         const zonedDate = toZonedTime(time, 'America/New_York')
-        console.log('zonedDate', zonedDate)
         return format(zonedDate, "hh:mm a")
     },
     },
@@ -94,44 +93,7 @@ const columns: ColumnDef<Game>[] = [
         )
     },
     },
-    {
-    accessorKey: "location",
-    header: "Location",
-    cell: ({ row }) => {
-        return (<a 
-        href="https://www.google.com/search?q=Citi+Field" 
-        target="_blank" 
-        rel="noopener noreferrer"
-        className="text-blue-500 underline"
-    >
-        Citi Field
-    </a>)
-    }
-    },
-    {
-    accessorKey: "status",
-    header: "Status",
-    cell: ({ row }) => {
-        const status = row.getValue("status") as string
-        return (
-        <div className="capitalize">{status?.replace("_", " ") || "Scheduled"}</div>
-        )
-    },
-    },
-    {
-    id: "score",
-    header: "Score",
-    cell: ({ row }) => {
-        const homeScore = row.original.home_score
-        const awayScore = row.original.away_score
-        
-        if (homeScore === undefined || awayScore === undefined) {
-        return "-"
-        }
-        
-        return `${homeScore} - ${awayScore}`
-    },
-    },
+
 ]
 
 const table = useReactTable({
@@ -146,8 +108,13 @@ const table = useReactTable({
     enableRowSelection: true,
     enableMultiRowSelection: false,
     state: {
-    sorting,
     columnFilters,
+    },
+    initialState: {
+        sorting: [{ id: "start_time", desc: false }],
+        pagination: {
+            pageSize: 5,
+        },
     },
 })
 
@@ -156,10 +123,9 @@ return (
     <div className="flex items-center justify-between">
         <Input
         placeholder="Filter by team..."
-        value={(table.getColumn("home_team")?.getFilterValue() as string) ?? ""}
+        value={(table.getColumn("away_team")?.getFilterValue() as string) ?? ""}
         onChange={(event) => {
             const value = event.target.value
-            table.getColumn("home_team")?.setFilterValue(value)
             table.getColumn("away_team")?.setFilterValue(value)
         }}
         className="max-w-sm"

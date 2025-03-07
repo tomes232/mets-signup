@@ -2,15 +2,15 @@ import { Link } from "@remix-run/react";
 import { Home, Calendar, Ticket } from "lucide-react";
 import { cn } from "~/lib/utils";
 import { Button } from "~/components/ui/button";
-import { SidebarContent, SidebarGroup, SidebarMenu } from "~/components/ui/sidebar";
+import { Sidebar, SidebarHeader, SidebarMenu } from "~/components/ui/sidebar";
 interface SidebarProps extends React.HTMLAttributes<HTMLDivElement> {}
 
-export function Sidebar({ className, ...props }: SidebarProps) {
+export function AppSidebar({ className, ...props }: SidebarProps) {
 return (
-    <SidebarContent>
-    <SidebarGroup>
+    <Sidebar {...props}>
+    <SidebarHeader>
       <SidebarMenu>
-    <div className={cn("pb-12 w-[220px] border-r h-screen", className)} {...props}>
+    <div className={cn("pb-12 w-[220px]  h-screen", className)} {...props}>
     <div className="space-y-4 py-4">
         <div className="px-4 py-2">
         <h2 className="mb-2 px-2 text-lg font-semibold tracking-tight">
@@ -40,8 +40,8 @@ return (
     </div>
     </div>
     </SidebarMenu>
-    </SidebarGroup>
-    </SidebarContent>
+    </SidebarHeader>
+    </Sidebar>
 );
 }
 

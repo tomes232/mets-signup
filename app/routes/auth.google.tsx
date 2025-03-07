@@ -4,7 +4,6 @@ import { createSupabaseClientForServer } from '../utils/supabase';
 
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
-    console.log('signing in with google')
     const headers = new Headers();
     
     const supabase = createSupabaseClientForServer(request, headers)
@@ -19,11 +18,9 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
       },
     });
 
-    console.log('data', data)   
 
   
     if (error) {
-      console.log('Error during Google OAuth sign-in:', error);
       throw new Error(error.message);
     }
   

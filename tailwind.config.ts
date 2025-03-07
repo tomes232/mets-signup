@@ -64,14 +64,14 @@ export default {
   				'5': 'hsl(var(--chart-5))'
   			},
   			sidebar: {
-  				DEFAULT: 'hsl(var(--sidebar-background))',
-  				foreground: 'hsl(var(--sidebar-foreground))',
-  				primary: 'hsl(var(--sidebar-primary))',
-  				'primary-foreground': 'hsl(var(--sidebar-primary-foreground))',
-  				accent: 'hsl(var(--sidebar-accent))',
-  				'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
-  				border: 'hsl(var(--sidebar-border))',
-  				ring: 'hsl(var(--sidebar-ring))'
+  				DEFAULT: '#002D72', // Mets blue as background
+  				foreground: '#FFFFFF', // White text for contrast
+  				primary: '#FF4F00', // Mets orange as primary
+  				'primary-foreground': '#FFFFFF', // White text for contrast
+  				accent: '#FF4F00', // Mets orange as accent
+  				'accent-foreground': '#FFFFFF', // White text for contrast
+  				border: '#002D72', // Mets blue for borders
+  				ring: '#FF4F00' // Mets orange for focus rings
   			}
   		}
   	}

@@ -1,31 +1,40 @@
-import { createClient } from '@supabase/supabase-js'
 import { useEffect, useState } from 'react'
 import { format, toZonedTime } from "date-fns-tz"
 import { useLoaderData, useActionData } from '@remix-run/react'
 import { ActionFunctionArgs, LoaderFunctionArgs, data } from '@remix-run/node'
 import { createSupabaseClientForServer } from '~/utils/supabase'
-import TeamWithLogo from '~/components/TeamWithLogo'
 import { GameDataTable } from '~/components/GameDataTable'
 import GameCalendar from '~/components/Calendar'
 import TicketRequestModal from '~/components/TicketRequestModal'
 import { getUserId } from '~/services/session.server'
 import {toast} from 'sonner'
 import { Skeleton } from '~/components/ui/skeleton'
-
+import { Ticket } from '~/components/Ticket'
+import { Switch } from '~/components/ui/switch'
+import { Label } from '~/components/ui/label'
 interface Game {
   id: string
   home_team: string
   away_team: string
   start_time: Date
-  ticket_1: string
-  ticket_2: string
+  ticket_1: Ticket
+  ticket_2: Ticket
+}
+
+interface Ticket {
+  id: string
+  sec: number
+  row: number
+  seat: number
+  game_id: string
+  owner: string
 }
 
 export const loader = async ({ request }: LoaderFunctionArgs) =>{
     const headers = new Headers();
     const supabase = createSupabaseClientForServer(request, headers)
     // get all supabase 
-    const { data, error } = await supabase.from('Games').select('*')
+    const { data, error } = await supabase.from('Games').select('*, ticket_1:Tickets!Games_ticket_1_fkey(*), ticket_2:Tickets!Games_ticket_2_fkey(*)')
 
     return { data }
 }
@@ -38,7 +47,6 @@ export const action = async ({ request }: ActionFunctionArgs) => {
     const sec = formData.get('sec');
     const row = formData.get('row');
     const seat = formData.get('seat');
-
     const headers = new Headers();
     const supabase = createSupabaseClientForServer(request, headers);
 
@@ -76,7 +84,6 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 
         return data({ data: gameData }, {status: 200});
     } catch (error) {
-        console.error('Transaction failed:', (error as Error).message);
         return data({ error: (error as Error).message }, { status: 500 });
     }
 };
@@ -100,7 +107,6 @@ export default function CalendarPage() {
     })
 
     useEffect(() => {
-        console.log(actionData)
         if (actionData) {
             toast.success("Ticket requested successfully")
         }
@@ -111,7 +117,8 @@ export default function CalendarPage() {
 
 
     return (
-        <div className="relative flex p-8">
+        <div className="flex items-center justify-center min-h-screen bg-gray-50 p-8 space-x-4">
+
             {/* Ticket Request Modal */}
             {showTicketModal && selectedGame && (
                 <TicketRequestModal selectedGame={selectedGame} setShowTicketModal={setShowTicketModal} />
@@ -119,28 +126,27 @@ export default function CalendarPage() {
             <div className="w-1/3 p-4">
                 <h2 className="text-xl font-bold mb-4">Game Information</h2>
                 {selectedGame ? (
-                    <div>
-                        <p><strong>Date:</strong> {format(toZonedTime(new Date(selectedGame.start_time), 'America/New_York'), "PPP")}</p>
-                        <div className="flex flex-row gap-4 items-center">
-                            <TeamWithLogo teamName={selectedGame.home_team} />
-                            <p><strong>VS</strong></p>
-                            <TeamWithLogo teamName={selectedGame.away_team} />
-                        </div>
-                        <p><strong>Start Time:</strong> {format(toZonedTime(new Date(selectedGame.start_time), 'America/New_York'), "p")}</p>
-                        <p>Venue: <a 
-                            href="https://www.google.com/search?q=Citi+Field" 
-                            target="_blank" 
-                            rel="noopener noreferrer"
-                            className="text-blue-500 underline"
-                        >
-                            Citi Field
-                        </a></p>
-                        <button 
-                            className="mt-4 px-4 py-2 bg-green-500 text-white rounded"
-                            onClick={() => setShowTicketModal(true)}
-                        >
-                            Request Ticket
-                        </button>
+                    <div className="flex flex-col space-y-3">
+                        <Ticket 
+                            game={selectedGame} 
+                            ticket={selectedGame.ticket_1 ? selectedGame.ticket_1 : {
+                                id: null,
+                                sec: 134,
+                                row: 11,
+                                seat: 19,
+                                game_id: selectedGame.id,
+                                owner: null,
+                            }} 
+                            setShowTicketModal={setShowTicketModal} 
+                        />
+                        <Ticket game={selectedGame} ticket={selectedGame.ticket_2 ? selectedGame.ticket_2 : {
+                            id: null,
+                            sec: 134,
+                            row: 11,
+                            seat: 20,
+                            game_id: selectedGame.id,
+                            owner: null,
+                        }} setShowTicketModal={setShowTicketModal} />                    
                     </div>
                 ) : (
                     <div className="flex flex-col space-y-3">
@@ -152,14 +158,15 @@ export default function CalendarPage() {
                   </div>
                 )}
             </div>
-            <div className="w-2/3 p-4">
+            <div className="w-1/3 p-4">
                 <h1 className="text-2xl font-bold mb-6">Schedule</h1>
-                <button 
-                    onClick={() => setToggle(!toggle)} 
-                    className="mb-4 px-4 py-2 bg-blue-500 text-white rounded"
-                >
-                    {toggle ? "Switch to Calendar View" : "Switch to List View"}
-                </button>
+                  <Switch
+                        id='view-toggle'
+                      checked={toggle}
+                      onCheckedChange={() => setToggle(!toggle)}
+                    />
+                      <Label htmlFor="view-toggle">{toggle ? "Calendar View" : "List View"}</Label>
+                      
                 {toggle ? (
                     <GameDataTable data={games} selectedRowId={selectedRowId} setSelectedRowId={setSelectedRowId} setDate={setDate} />
                 ) : (

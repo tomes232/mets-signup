@@ -67,8 +67,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
 }
 
 export default function App() {
-  // const { userId } = useLoaderData<{ userId: string | null }>();
-  // console.log("user id", userId); 
+
   return (
     <div className="flex flex-row">
       <LayoutWrapper>

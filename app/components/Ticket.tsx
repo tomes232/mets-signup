@@ -2,8 +2,7 @@ import * as React from "react"
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "~/components/ui/card"
 import TeamWithLogo from "~/components/TeamWithLogo"
 import { format, toZonedTime } from "date-fns-tz"
-import Approved from "~/assets/approved"
-// ^ Adjust the import path based on where you placed your shadcn/ui components
+
 
 interface Game {
   id: string;
@@ -16,19 +15,37 @@ interface Ticket {
   id: string;
   game_id: string;
   owner: string;
-  sec: string;
-  row: string;
-  seat: string;
+  sec: number;
+  row: number;
+  seat: number;
+  status: "pending" | "approved" | null;
 }
 
 interface TicketProps {
   game: Game;
   ticket: Ticket;
+  setShowTicketModal: React.Dispatch<React.SetStateAction<boolean>> | ((show: boolean) => void);
 }
 
-export function Ticket({ game, ticket }: TicketProps) {
-    console.log(game)
-    console.log(ticket)
+function TicketStatus({ ticket, setShowTicketModal }: { ticket: Ticket, setShowTicketModal: React.Dispatch<React.SetStateAction<boolean>> | ((show: boolean) => void) }) {
+   console.log(ticket)
+    if (ticket?.status === undefined) {
+    return <button
+        onClick={() => setShowTicketModal(true)}
+        className="text-blue-600 hover:text-blue-800"
+    >
+      Request Ticket
+    </button>
+    }
+
+    if (ticket.status === "pending") {
+    return <div>Status: Pending</div>
+  }
+  return <div>Status: Approved</div>
+}
+
+
+export function Ticket({ game, ticket, setShowTicketModal }: TicketProps) {
 
   return (
     <Card className="relative flex w-[360px] bg-white shadow-lg">
@@ -61,9 +78,8 @@ export function Ticket({ game, ticket }: TicketProps) {
             <span className="font-bold">Seat:</span> {ticket.seat}
           </p>
         </CardContent>
-        {/* SVG Stamp (bottom-left corner) */}
         <div className="absolute bottom-2 right-2">
-            <Approved />
+            <TicketStatus ticket={ticket} setShowTicketModal={setShowTicketModal} />
         </div>
       </div>
 
