@@ -1,5 +1,5 @@
 import { Calendar as UICalendar } from "~/components/ui/calendar"
-import {  toZonedTime } from "date-fns-tz"
+import { toZonedTime } from "date-fns-tz"
 
 type Game = {
     date: string

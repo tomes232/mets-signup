@@ -1,6 +1,7 @@
 import { parseCookieHeader, createServerClient, serializeCookieHeader } from '@supabase/ssr'
 
 export const createSupabaseClientForServer = (request: Request, headers: Headers) => {
+  
   return createServerClient(
     process.env.SUPABASE_URL!,
     process.env.SUPABASE_ANON_KEY!,
@@ -15,6 +16,7 @@ export const createSupabaseClientForServer = (request: Request, headers: Headers
                     headers.append('Set-Cookie', serializeCookieHeader(name, value, options))
                 )
             } catch (error) {
+              console.error('Error setting cookies', error)
             }
         },
       }

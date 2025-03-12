@@ -28,20 +28,19 @@ interface TicketProps {
 }
 
 function TicketStatus({ ticket, setShowTicketModal }: { ticket: Ticket, setShowTicketModal: React.Dispatch<React.SetStateAction<boolean>> | ((show: boolean) => void) }) {
-   console.log(ticket)
     if (ticket?.status === undefined) {
-    return <button
+    return <div className="text-sm"><button
         onClick={() => setShowTicketModal(true)}
-        className="text-blue-600 hover:text-blue-800"
+        className="text-blue-600 hover:text-blue-800 "
     >
       Request Ticket
-    </button>
+    </button> | $50</div>
     }
 
     if (ticket.status === "pending") {
-    return <div>Status: Pending</div>
+    return <div className="text-sm">Pending | <button className="text-blue-600 hover:text-blue-800 ">cancel</button></div>
   }
-  return <div>Status: Approved</div>
+  return <div className="text-sm">Approved | <button className="text-blue-600 hover:text-blue-800 " >cancel</button></div>
 }
 
 

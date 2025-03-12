@@ -18,11 +18,10 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
       },
     });
 
-
   
     if (error) {
       throw new Error(error.message);
-    }
+    }    
   
     // This will redirect to Google's authentication page
     return redirect(data.url, { headers });

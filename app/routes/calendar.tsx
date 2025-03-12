@@ -6,12 +6,13 @@ import { createSupabaseClientForServer } from '~/utils/supabase'
 import { GameDataTable } from '~/components/GameDataTable'
 import GameCalendar from '~/components/Calendar'
 import TicketRequestModal from '~/components/TicketRequestModal'
-import { getUserId } from '~/services/session.server'
 import {toast} from 'sonner'
 import { Skeleton } from '~/components/ui/skeleton'
 import { Ticket } from '~/components/Ticket'
 import { Switch } from '~/components/ui/switch'
 import { Label } from '~/components/ui/label'
+import { createGameEvent } from '~/services/google.calendar'
+
 interface Game {
   id: string
   home_team: string
@@ -41,7 +42,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) =>{
 
 export const action = async ({ request }: ActionFunctionArgs) => {
     const formData = await request.formData();
-    const userId = await getUserId(request);
+ 
     const gameId = formData.get('game');
     const ticket = formData.get('ticket');
     const sec = formData.get('sec');
@@ -49,6 +50,16 @@ export const action = async ({ request }: ActionFunctionArgs) => {
     const seat = formData.get('seat');
     const headers = new Headers();
     const supabase = createSupabaseClientForServer(request, headers);
+    const { data: { user } } = await supabase.auth.getUser()
+    const userId = user?.id
+
+    //check if the user is authenticated
+    const { data: userData, error: userError } = await supabase.auth.getUser();
+    if (userError) {
+        throw new Error('Failed to get user');
+    }
+   
+    
 
     try {
         // Start a transaction
@@ -82,9 +93,22 @@ export const action = async ({ request }: ActionFunctionArgs) => {
             throw new Error('Failed to update game');
         }
 
-        return data({ data: gameData }, {status: 200});
+        // if (gameData?.length > 0) {
+        //     const game = gameData[0];
+        //     if (game.start_time && game.home_team && game.away_team) {
+        //       await createGameEvent(request, {
+        //         start_time: game.start_time,
+        //         home_team: game.home_team || "",
+        //         away_team: game.away_team,
+        //       });
+        //     }
+        //   }
+
+        
+
+        return  {data: gameData , status: 200};
     } catch (error) {
-        return data({ error: (error as Error).message }, { status: 500 });
+        return { error: (error as Error).message,  status: 500 };
     }
 };
 
@@ -107,23 +131,27 @@ export default function CalendarPage() {
     })
 
     useEffect(() => {
-        if (actionData) {
+        if (actionData?.status === 200) {
             toast.success("Ticket requested successfully")
+            setShowTicketModal(false)
         }
-        else {
+        else if(actionData?.status === 500) {
             toast.error("Ticket request failed")
         }
     }, [actionData, toast])
 
 
     return (
-        <div className="flex items-center justify-center min-h-screen bg-gray-50 p-8 space-x-4">
-
+        <div className="flex flex-col md:flex-row items-center justify-center min-h-screen bg-gray-50 p-4 md:p-8 space-y-8 md:space-y-0 md:space-x-4">
             {/* Ticket Request Modal */}
             {showTicketModal && selectedGame && (
                 <TicketRequestModal selectedGame={selectedGame} setShowTicketModal={setShowTicketModal} />
             )}
-            <div className="w-1/3 p-4">
+
+
+            
+            {/* Game Information - Full width on mobile, 1/3 on desktop */}
+            <div className="w-full md:w-1/2 lg:w-1/3 p-4">
                 <h2 className="text-xl font-bold mb-4">Game Information</h2>
                 {selectedGame ? (
                     <div className="flex flex-col space-y-3">
@@ -150,23 +178,26 @@ export default function CalendarPage() {
                     </div>
                 ) : (
                     <div className="flex flex-col space-y-3">
-                    <Skeleton className="h-[125px] w-[250px] rounded-xl" />
-                    <div className="space-y-2">
-                      <Skeleton className="h-4 w-[250px]" />
-                      <Skeleton className="h-4 w-[200px]" />
+                        <Skeleton className="h-[125px] w-full md:w-[250px] rounded-xl" />
+                        <div className="space-y-2">
+                            <Skeleton className="h-4 w-full md:w-[250px]" />
+                            <Skeleton className="h-4 w-full md:w-[200px]" />
+                        </div>
                     </div>
-                  </div>
                 )}
             </div>
-            <div className="w-1/3 p-4">
+                                    {/* Schedule - Full width on mobile, 1/3 on desktop */}
+                                    <div className="w-full md:w-1/2 lg:w-1/3 p-4">
                 <h1 className="text-2xl font-bold mb-6">Schedule</h1>
-                  <Switch
+                <div className="flex items-center gap-2 mb-4">
+                    <Switch
                         id='view-toggle'
-                      checked={toggle}
-                      onCheckedChange={() => setToggle(!toggle)}
+                        checked={toggle}
+                        onCheckedChange={() => setToggle(!toggle)}
                     />
-                      <Label htmlFor="view-toggle">{toggle ? "Calendar View" : "List View"}</Label>
-                      
+                    <Label htmlFor="view-toggle">{toggle ? "Calendar View" : "List View"}</Label>
+                </div>
+                
                 {toggle ? (
                     <GameDataTable data={games} selectedRowId={selectedRowId} setSelectedRowId={setSelectedRowId} setDate={setDate} />
                 ) : (

@@ -1,9 +1,5 @@
 import { redirect, type LoaderFunctionArgs } from '@remix-run/node'
-import { createServerClient, createBrowserClient, parseCookieHeader, serializeCookieHeader } from '@supabase/ssr'
-import { useLoaderData } from '@remix-run/react'
 import { createSupabaseClientForServer } from '../utils/supabase'
-import { createUserSession } from '../services/session.server'
-import { useEffect } from 'react'
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const requestUrl = new URL(request.url)
@@ -23,15 +19,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
 
     if (!error) {
-      return createUserSession({
-        request,
-        userId: data.user.id,
-        email: data.user.email || '',
-        name: data.user.user_metadata.name || '',
-        remember: false,
-        redirectTo: next,
-      })
-      
+      return redirect(next, { headers })
     }
   }
 

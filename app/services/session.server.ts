@@ -1,10 +1,11 @@
-import { createCookieSessionStorage, redirect } from "@remix-run/node";
+import { createCookieSessionStorage, redirect, Session } from "@remix-run/node";
 
 // create User model
 export type User = {
     id: string;
     email: string;
     name: string;
+    avatar_url: any
 }
 
 // Session secret should be an environment variable in production
@@ -32,6 +33,17 @@ export async function getSession(request: Request) {
 const cookie = request.headers.get("Cookie");
 return sessionStorage.getSession(cookie);
 }
+
+export async function getUser(request: Request) {
+    const session = await getSession(request);
+    const userId = session.get("userId");
+    if (!userId || typeof userId !== "string") return null;
+    const email = session.get("email");
+    const name = session.get("name");
+
+    return { id: userId, email, name };
+}
+
 
 // Create a user session
 export async function createUserSession({

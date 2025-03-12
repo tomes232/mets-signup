@@ -5,13 +5,16 @@ import {
   Scripts,
   ScrollRestoration,
   redirect,
+  useLoaderData
 } from "@remix-run/react";
 import type { LinksFunction, LoaderFunction } from "@remix-run/node";
-import { getUserId } from "./services/session.server";
-import { createClient } from '@supabase/supabase-js'
 import "./tailwind.css";
 import { Toaster } from "~/components/ui/sonner";
 import LayoutWrapper from "~/components/Layout";
+import { createSupabaseClientForServer } from "~/utils/supabase";
+import { getGoogleClient } from "./utils/google.api";
+
+
 export const links: LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
   {
@@ -28,21 +31,24 @@ export const links: LinksFunction = () => [
 export const loader: LoaderFunction = async ({ request }) => {
   const requestUrl = new URL(request.url)
 
-  const userId = await getUserId(request);
-
+  // const userId = await getUserId(request);
+  const supabase = createSupabaseClientForServer(request, new Headers())
+  const { data: { user } } = await supabase.auth.getUser()
+  const userId = user?.id
   // Get the current URL path
   const url = new URL(request.url);
   const path = url.pathname;
+
   
   // If user is not logged in and not on login/signup pages, redirect to login
-  if (!userId && !path.match(/^\/(login|signup|auth\/callback|$)/)) {
+  if (!userId && !path.match(/^\/(login|signup|auth\/callback|auth\/google|email-verification|$)/)) {
     const searchParams = new URLSearchParams([
       ["redirectTo", path]
     ]);
     return redirect(`/login?${searchParams}`);
   }
-  
-  return { userId };
+
+  return {  user: { id: user?.id || "", email: user?.email || "", name: user?.user_metadata?.name || "", avatar_url: user?.user_metadata?.avatar_url } };
 };
 
 
@@ -67,12 +73,15 @@ export function Layout({ children }: { children: React.ReactNode }) {
 }
 
 export default function App() {
+  const { user } = useLoaderData<typeof loader>()
+
 
   return (
-    <div className="flex flex-row">
-      <LayoutWrapper>
+    <>
+{  user?.id ?    <div className="flex flex-row"> <LayoutWrapper user={user}>
         <Outlet />
-      </LayoutWrapper>
-    </div>
+      </LayoutWrapper></div> :<div className="min-h-screen bg-gradient-to-r from-blue-900 to-orange-500 text-white"> <div className="flex items-center justify-center min-h-screen"><Outlet /></div> </div>}
+    </>
   );
 }
+
