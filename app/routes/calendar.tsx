@@ -22,21 +22,25 @@ interface Game {
   ticket_2: Ticket
 }
 
+interface Owner {
+    name: string;
+    avatar_url: string;
+  }
+
 interface Ticket {
   id: string
   sec: number
   row: number
   seat: number
   game_id: string
-  owner: string
+  owner: Owner | null
 }
 
 export const loader = async ({ request }: LoaderFunctionArgs) =>{
     const headers = new Headers();
     const supabase = createSupabaseClientForServer(request, headers)
     // get all supabase 
-    const { data, error } = await supabase.from('Games').select('*, ticket_1:Tickets!Games_ticket_1_fkey(*), ticket_2:Tickets!Games_ticket_2_fkey(*)')
-
+    const { data, error } = await supabase.from('Games').select('*, ticket_1:Tickets!Games_ticket_1_fkey(*, owner:profiles!Tickets_owner_fkey1(name, avatar_url)), ticket_2:Tickets!Games_ticket_2_fkey(*)')
     return { data }
 }
 
@@ -92,7 +96,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
         if (gameError) {
             throw new Error('Failed to update game');
         }
-
+        //TODO: make this work
         // if (gameData?.length > 0) {
         //     const game = gameData[0];
         //     if (game.start_time && game.home_team && game.away_team) {
@@ -165,16 +169,21 @@ export default function CalendarPage() {
                                 game_id: selectedGame.id,
                                 owner: null,
                             }} 
+                            showAvatar={true}
                             setShowTicketModal={setShowTicketModal} 
                         />
-                        <Ticket game={selectedGame} ticket={selectedGame.ticket_2 ? selectedGame.ticket_2 : {
+                        <Ticket 
+                        game={selectedGame} 
+                        ticket={selectedGame.ticket_2 ? selectedGame.ticket_2 : {
                             id: null,
                             sec: 134,
                             row: 11,
                             seat: 20,
                             game_id: selectedGame.id,
                             owner: null,
-                        }} setShowTicketModal={setShowTicketModal} />                    
+                        }} 
+                        showAvatar={true}
+                        setShowTicketModal={setShowTicketModal} />                    
                     </div>
                 ) : (
                     <div className="flex flex-col space-y-3">

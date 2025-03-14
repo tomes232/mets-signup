@@ -7,7 +7,6 @@ import { Link } from "@remix-run/react";
 import { User } from "~/services/session.server";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuLabel, DropdownMenuTrigger, DropdownMenuSeparator, DropdownMenuItem } from "./ui/dropdown-menu";
-import { Button } from "./ui/button";
 
 export default function LayoutWrapper({ children, user }: { children: ReactNode, user: User | null }) {
   return (
@@ -32,6 +31,11 @@ export default function LayoutWrapper({ children, user }: { children: ReactNode,
           <DropdownMenuContent className="w-56">
           <DropdownMenuLabel><p className="text-sm">{user?.email}</p></DropdownMenuLabel>
           <DropdownMenuSeparator />
+          <DropdownMenuItem>
+            <Link to={`/profile/${user?.id}`} className="w-full">
+              Profile
+            </Link>
+          </DropdownMenuItem>
           <DropdownMenuItem>
             <Link to="/signout" className="w-full">
               Sign Out

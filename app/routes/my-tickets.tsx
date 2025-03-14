@@ -11,11 +11,15 @@ interface Game {
   away_team: string;
   start_time: string;
 }
+interface Owner {
+  name: string;
+  avatar_url: string;
+}
 
 interface Ticket {
   id: string;
   game_id: string;
-  owner: string;
+  owner: Owner;
   sec: number;
   row: number;
   seat: number;
@@ -29,7 +33,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   const { data: { user } } = await supabase.auth.getUser()
   const userId = user?.id
   const { data, error } = await supabase.from('Tickets')
-    .select('*, Games!Tickets_Game_fkey(*)')
+    .select('*, Games!Tickets_Game_fkey(*), owner:profiles!Tickets_owner_fkey1(name, avatar_url)')
     .eq('owner', userId)
   return data
 }
@@ -61,7 +65,7 @@ export default function MyTicketPage() {
               {data?.map((ticket: Ticket) => (
                 <CarouselItem key={ticket.id} className="pl-4 basis-full">
                   <div className="p-1">
-                    <Ticket game={ticket.Games} ticket={ticket} setShowTicketModal={() => {}} />
+                    <Ticket game={ticket.Games} ticket={ticket} showAvatar={false} setShowTicketModal={() => {}} />
                   </div>
                 </CarouselItem>
               ))}

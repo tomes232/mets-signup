@@ -31,7 +31,6 @@ export const links: LinksFunction = () => [
 export const loader: LoaderFunction = async ({ request }) => {
   const requestUrl = new URL(request.url)
 
-  // const userId = await getUserId(request);
   const supabase = createSupabaseClientForServer(request, new Headers())
   const { data: { user } } = await supabase.auth.getUser()
   const userId = user?.id
@@ -48,7 +47,18 @@ export const loader: LoaderFunction = async ({ request }) => {
     return redirect(`/login?${searchParams}`);
   }
 
-  return {  user: { id: user?.id || "", email: user?.email || "", name: user?.user_metadata?.name || "", avatar_url: user?.user_metadata?.avatar_url } };
+  const {data: profileData, error: profileError} = await supabase.from("profiles")
+                                                            .select('id, name, email, avatar_url')
+                                                            .eq('id', userId)
+  if (profileError){
+    console.error("Unable to get profle information")
+    return {  user: { id: user?.id || "", email: user?.email || "", name: user?.user_metadata?.name || "", avatar_url: user?.user_metadata?.avatar_url } };
+  }
+  else{
+    const userInfo = profileData[0]
+    return { user: { id: userInfo?.id, name: userInfo?.name, email: userInfo?.email, avatar_url: userInfo?.avatar_url}}
+  }
+
 };
 
 

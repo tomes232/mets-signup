@@ -1,6 +1,7 @@
 // app/routes/auth.google.tsx
 import { LoaderFunctionArgs, redirect, type ActionFunctionArgs } from '@remix-run/node'
 import { createSupabaseClientForServer } from '../utils/supabase';
+import { serializeCookieHeader, SetCookie } from '@supabase/ssr';
 
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
@@ -17,7 +18,6 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
           },
       },
     });
-
   
     if (error) {
       throw new Error(error.message);

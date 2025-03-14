@@ -17,7 +17,7 @@ export default function Index() {
 
   
     return (
-      <div className="min-h-screen bg-gradient-to-r from-blue-900 to-orange-500 text-white">
+      <div className="min-h-screen ">
         {/* Header with Mets logo and navigation */}
         {/* Main hero section */}
         <main className="flex flex-col items-center justify-center flex-1 px-4">

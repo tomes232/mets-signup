@@ -1,6 +1,5 @@
 import { google } from "googleapis"
 import { createSupabaseClientForServer } from "~/utils/supabase"
-import { parseCookieHeader } from "@supabase/ssr"
 
 interface Game {
     home_team: string
@@ -8,7 +7,24 @@ interface Game {
     start_time: Date
   }
 
-export async function createGameEvent(request: Request, event: Game){
+export const oauth2Client = new google.auth.OAuth2(
+    process.env.GOOGLE_CLIENT_ID!,
+    process.env.GOOGLE_CLIENT_SECRET!,
+    process.env.GOOGLE_REDIRECT_URL
+  )
+
+
+export const generateAuthUrl = (userId : string) => {
+    const scopes = ["https://www.googleapis.com/auth/calendar"];
+    return oauth2Client.generateAuthUrl({
+      access_type: "offline",
+      scope: scopes,
+      state: userId,
+      prompt: "consent",
+    });
+  };
+  
+  export async function createGameEvent(request: Request, event: Game){
     debugger;
     const client = await getGoogleClient(request)
 
@@ -60,8 +76,10 @@ const getGoogleClient = async (request: Request) =>  {
     const supabase = createSupabaseClientForServer(request, new Headers())
 
     const { data, error } = await supabase.auth.getSession()
+
   
-    const token = data?.session?.access_token
+    const token = data?.session?.provider_token
+    const refresh_token= data?.session?.provider_refresh_token
 
     if (!token){
         return
@@ -72,7 +90,7 @@ const getGoogleClient = async (request: Request) =>  {
       process.env.GOOGLE_CLIENT_SECRET!,
     )
   
-    client.setCredentials({access_token: token})
+    client.setCredentials({access_token: token, refresh_token: refresh_token, scope:"https://www.googleapis.com/auth/calendar.events"})
   
     return client
   

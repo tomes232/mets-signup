@@ -2,6 +2,8 @@ import * as React from "react"
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "~/components/ui/card"
 import TeamWithLogo from "~/components/TeamWithLogo"
 import { format, toZonedTime } from "date-fns-tz"
+import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "./ui/tooltip";
 
 
 interface Game {
@@ -14,20 +16,25 @@ interface Game {
 interface Ticket {
   id: string;
   game_id: string;
-  owner: string;
+  owner: Owner | null;
   sec: number;
   row: number;
   seat: number;
   status: "pending" | "approved" | null;
 }
+interface Owner {
+  name: string;
+  avatar_url: string;
+}
 
 interface TicketProps {
   game: Game;
   ticket: Ticket;
+  showAvatar: boolean;
   setShowTicketModal: React.Dispatch<React.SetStateAction<boolean>> | ((show: boolean) => void);
 }
 
-function TicketStatus({ ticket, setShowTicketModal }: { ticket: Ticket, setShowTicketModal: React.Dispatch<React.SetStateAction<boolean>> | ((show: boolean) => void) }) {
+function TicketStatus({ ticket, showAvatar, setShowTicketModal }: { ticket: Ticket, showAvatar: boolean, setShowTicketModal: React.Dispatch<React.SetStateAction<boolean>> | ((show: boolean) => void) }) {
     if (ticket?.status === undefined) {
     return <div className="text-sm"><button
         onClick={() => setShowTicketModal(true)}
@@ -36,7 +43,25 @@ function TicketStatus({ ticket, setShowTicketModal }: { ticket: Ticket, setShowT
       Request Ticket
     </button> | $50</div>
     }
+    if(ticket.owner && showAvatar){
+      return     <TooltipProvider>
+      <Tooltip>
+        <TooltipTrigger asChild>
+        <Avatar>
+            <AvatarImage src={ticket.owner?.avatar_url || ''} />
+            <AvatarFallback>
+              {ticket.owner?.name?.charAt(0)}
+            </AvatarFallback>
+          </Avatar>
+          </TooltipTrigger>
+        <TooltipContent>
+          <p>{ticket.owner.name}</p>
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
 
+    }
+    //TODO: MAKE THE CANCEL BUTTON WORK SO USERS CAN CANCEL THEIR REQUESTS
     if (ticket.status === "pending") {
     return <div className="text-sm">Pending | <button className="text-blue-600 hover:text-blue-800 ">cancel</button></div>
   }
@@ -44,7 +69,7 @@ function TicketStatus({ ticket, setShowTicketModal }: { ticket: Ticket, setShowT
 }
 
 
-export function Ticket({ game, ticket, setShowTicketModal }: TicketProps) {
+export function Ticket({ game, ticket, showAvatar, setShowTicketModal }: TicketProps) {
 
   return (
     <Card className="relative flex w-[360px] bg-white shadow-lg">
@@ -78,7 +103,8 @@ export function Ticket({ game, ticket, setShowTicketModal }: TicketProps) {
           </p>
         </CardContent>
         <div className="absolute bottom-2 right-2">
-            <TicketStatus ticket={ticket} setShowTicketModal={setShowTicketModal} />
+          {/* TODO: IF THE USER DOESNT OWN THE TICKET SHOW AN AVATAR OF THE OTHER USERS TICKET */}
+            <TicketStatus ticket={ticket} showAvatar={showAvatar} setShowTicketModal={setShowTicketModal} />
         </div>
       </div>
 
