@@ -6,10 +6,11 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   const headers = new Headers();
 
   const supabase = createSupabaseClientForServer(request, headers);
+  const redirectUrl = process.env.GOOGLE_REDIRECT_URL;
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: "google",
     options: {
-      redirectTo: `${!process.env.GOOGLE_REDIRECT_URL}`,
+      redirectTo: redirectUrl || "/",
       queryParams: {
         access_type: "offline",
         prompt: "consent",
