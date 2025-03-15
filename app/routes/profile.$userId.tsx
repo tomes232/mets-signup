@@ -1,7 +1,7 @@
 
 import { ActionFunctionArgs, LoaderFunctionArgs, UploadHandler, data, redirect, unstable_composeUploadHandlers, unstable_createMemoryUploadHandler, unstable_parseMultipartFormData } from '@remix-run/node'
 import { createSupabaseClientForServer, supabaseUploadHandler } from '~/utils/supabase'
-import { useLoaderData, useActionData, Form, Outlet } from '@remix-run/react'
+import { useLoaderData, useActionData, Form, Outlet, useSubmit } from '@remix-run/react'
 import { Input } from '~/components/ui/input'
 import { Label } from '~/components/ui/label'
 import { Button } from '~/components/ui/button'
@@ -29,10 +29,6 @@ export const loader = async ({request, params}: LoaderFunctionArgs ) =>{
     return profileData[0]
 
 }
-
-  
-
-
 
 
 export const action = async ({request,  params }: ActionFunctionArgs ) => {
@@ -117,6 +113,7 @@ export const action = async ({request,  params }: ActionFunctionArgs ) => {
 export default function profilePage() {
     const profileData = useLoaderData<typeof loader>()
     const inputRef = useRef<HTMLInputElement>(null);
+    const submit = useSubmit();
 
 
     return (
@@ -130,7 +127,7 @@ export default function profilePage() {
     </AvatarFallback>
   </Avatar>
 
-  <Form onChange={e => e.currentTarget.submit()} encType="multipart/form-data" method="post" > 
+  <Form onChange={e => submit(e.currentTarget)} encType="multipart/form-data" method="post" > 
 <input type="hidden" name="_action" value="updateAvatar" />
 <input type="hidden" name="userId" value={profileData.id} />
 <input style={{ display: "none" }} name="image" ref={inputRef} type="file" />

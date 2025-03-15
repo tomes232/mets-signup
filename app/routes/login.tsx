@@ -26,7 +26,7 @@ export let action = async ({ request }: ActionFunctionArgs) => {
         return new Response(JSON.stringify({ error: error.message }), { status: 400 });
     }
 
-    return redirect('/calendar', { headers })
+    return redirect('/schedule', { headers })
 }
 export default function Login({
     className,

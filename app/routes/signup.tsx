@@ -25,7 +25,7 @@ export let action = async ({ request }: ActionFunctionArgs) => {
             data: {
                 name: name as string
             },
-            emailRedirectTo: 'http://localhost:5173/calendar'
+            emailRedirectTo: 'http://localhost:5173/schedule'
         }
     })
     if (error) {

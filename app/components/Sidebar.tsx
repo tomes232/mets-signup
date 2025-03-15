@@ -24,9 +24,9 @@ return (
             </Link>
             </Button>
             <Button asChild variant="ghost" className="w-full justify-start">
-            <Link to="/calendar">
+            <Link to="/schedule">
                 <Calendar className="mr-2 h-4 w-4" />
-                Calendar
+                Schedule
             </Link>
             </Button>
             <Button asChild variant="ghost" className="w-full justify-start">
