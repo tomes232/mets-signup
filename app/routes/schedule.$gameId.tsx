@@ -120,7 +120,6 @@ export default function TicketListPage() {
   const [selectedTicket, setSelectedTicket] = useState<Ticket | null>(null);
   const { data: loaderData } = useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
-  console.log("Action Data: ", actionData);
   useEffect(() => {
     if (actionData?.status === 200) {
       toast.success("Ticket requested successfully");

@@ -9,6 +9,7 @@ import GameCalendar from "~/components/Calendar";
 import { Ticket } from "~/components/Ticket";
 import { Switch } from "~/components/ui/switch";
 import { Label } from "~/components/ui/label";
+import { useParams } from "@remix-run/react";
 
 interface Game {
   id: string;
@@ -56,6 +57,8 @@ export default function SchedulePage() {
   const { data: loaderData } = useLoaderData<typeof loader>();
   const games = loaderData ?? []; // Provide a default empty array if data is null
   const navigate = useNavigate();
+  const { gameId } = useParams();
+
   const selectedGame = games.find((game: Game) => {
     const zonedDate = toZonedTime(
       new Date(game.start_time),
@@ -67,6 +70,23 @@ export default function SchedulePage() {
       zonedDate.getFullYear() === date.getFullYear()
     );
   });
+
+  useEffect(() => {
+    // If no gameId is provided, navigate to the next game after today's date
+    if (!gameId && games.length > 0) {
+      const now = new Date();
+      const futureGames = games.filter(
+        (game: Game) => new Date(game.start_time) > now
+      );
+      if (futureGames.length > 0) {
+        futureGames.sort(
+          (a: Game, b: Game) =>
+            new Date(a.start_time).getTime() - new Date(b.start_time).getTime()
+        );
+        navigate(`/schedule/${futureGames[0].id}`);
+      }
+    }
+  }, [gameId, games, navigate]);
 
   useEffect(() => {
     if (selectedGame?.id) {
