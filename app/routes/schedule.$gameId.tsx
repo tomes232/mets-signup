@@ -28,6 +28,7 @@ interface Ticket {
   row: number;
   seat: number;
   status: "pending" | "approved" | null;
+  price: number;
 }
 
 export const loader = async ({ request, params }: LoaderFunctionArgs) => {
@@ -111,7 +112,6 @@ export default function TicketListPage() {
   const [selectedTicket, setSelectedTicket] = useState<Ticket | null>(null);
   const { data: loaderData } = useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
-  console.log("IN HERE");
 
   useEffect(() => {
     if (actionData?.status === 200) {

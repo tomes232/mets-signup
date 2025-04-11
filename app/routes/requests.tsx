@@ -92,6 +92,11 @@ export default function RequestsPage() {
                     {new Date(ticket.Games.start_time).toLocaleDateString()}
                   </p>
                 )}
+                {ticket.price && (
+                  <p>
+                    <strong>Price:</strong> ${ticket.price}
+                  </p>
+                )}
                 {ticket.profile && (
                   <div className="mt-2 flex items-center gap-2">
                     {ticket.profile.avatar_url && (

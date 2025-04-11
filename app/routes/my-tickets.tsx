@@ -80,7 +80,6 @@ export default function MyTicketPage() {
   const [selectedTicket, setSelectedTicket] = useState<Ticket | null>(null);
   const [showTicketModal, setShowTicketModal] = useState(false);
   const actionData = useActionData<typeof action>();
-  console.log("IN HERE");
 
   useEffect(() => {
     if (actionData?.status === 200) {

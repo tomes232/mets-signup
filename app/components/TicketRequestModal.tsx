@@ -18,6 +18,7 @@ interface Ticket {
   row: number;
   seat: number;
   status: "pending" | "approved" | null;
+  price: number;
 }
 
 interface Game {
@@ -84,9 +85,7 @@ export default function TicketRequestModal({
             <p className="text-sm text-gray-700">
               <span className="font-bold">Seat:</span> {selectedTicket?.seat}
             </p>
-          </div>
-
-          <div className="flex justify-end">
+            <div className="flex justify-end"></div>
             <Form method="post">
               <input
                 type="hidden"
@@ -98,9 +97,15 @@ export default function TicketRequestModal({
               <input type="hidden" name="row" value={selectedTicket?.row} />
               <input type="hidden" name="seat" value={selectedTicket?.seat} />
 
-              <Button type="submit" className="bg-green-500 text-white">
-                Confirm Request
-              </Button>
+              <div className="flex justify-between items-center">
+                <Button type="submit" className="bg-green-500 text-white">
+                  Confirm Request
+                </Button>
+                <p className="text-sm text-gray-700">
+                  <span className="font-bold">Total:</span> $
+                  {selectedTicket?.price}
+                </p>
+              </div>
             </Form>
           </div>
         </div>

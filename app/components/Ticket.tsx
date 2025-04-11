@@ -32,6 +32,7 @@ interface Ticket {
   row: number;
   seat: number;
   status: "pending" | "approved" | null;
+  price: number;
 }
 interface Owner {
   name: string;
@@ -75,7 +76,7 @@ function TicketStatus({
         >
           Request Ticket
         </button>{" "}
-        | $50
+        | ${ticket.price}
       </div>
     );
   }

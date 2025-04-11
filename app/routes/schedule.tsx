@@ -17,6 +17,7 @@ interface Game {
   start_time: Date;
   ticket_1: Ticket;
   ticket_2: Ticket;
+  price: number;
 }
 
 interface Owner {
