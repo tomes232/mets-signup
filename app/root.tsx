@@ -52,8 +52,6 @@ export const loader: LoaderFunction = async ({ request }) => {
     .select("id, name, email, avatar_url, is_admin")
     .eq("id", userId);
 
-  console.log(profileData, profileError);
-
   if (profileError) {
     console.error("Unable to get profle information");
     return {

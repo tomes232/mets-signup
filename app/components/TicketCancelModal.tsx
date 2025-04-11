@@ -38,7 +38,6 @@ export default function TicketCancelModal({
   selectedTicket: Ticket;
   setShowTicketModal: (show: boolean) => void;
 }) {
-  console.log("in ticket cancel modal", selectedTicket);
   return (
     <Dialog open={true} onOpenChange={setShowTicketModal}>
       <DialogHeader>

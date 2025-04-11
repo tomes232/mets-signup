@@ -35,7 +35,6 @@ export default function TicketRequestModal({
   selectedTicket: Ticket;
   setShowTicketModal: (show: boolean) => void;
 }) {
-  console.log("in ticket request modal", selectedTicket);
   return (
     <Sheet open={true} onOpenChange={setShowTicketModal}>
       <SheetContent>

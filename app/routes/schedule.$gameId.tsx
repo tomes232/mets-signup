@@ -67,8 +67,18 @@ export const action = async ({ request, params }: ActionFunctionArgs) => {
   if (userError) {
     throw new Error("Failed to get user");
   }
-  console.log("Ticket ID: ", ticket);
+  const { data: pendingRequests } = await supabase
+    .from("Tickets")
+    .select("*")
+    .eq("status", "pending")
+    .eq("owner", userId);
 
+  if (pendingRequests && pendingRequests.length >= 2) {
+    return {
+      error: "You can only have 2 pending requests at a time",
+      status: 400,
+    };
+  }
   try {
     // Start a transaction
     const { data: ticketData, error: ticketError } = await supabase
@@ -83,8 +93,6 @@ export const action = async ({ request, params }: ActionFunctionArgs) => {
         status: "pending",
       })
       .select();
-
-    console.log("TICKET DATA: ", ticketData, ticketError);
 
     if (ticketError || !ticketData || ticketData.length === 0) {
       throw new Error("Failed to insert ticket");
@@ -112,13 +120,15 @@ export default function TicketListPage() {
   const [selectedTicket, setSelectedTicket] = useState<Ticket | null>(null);
   const { data: loaderData } = useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
-
+  console.log("Action Data: ", actionData);
   useEffect(() => {
     if (actionData?.status === 200) {
       toast.success("Ticket requested successfully");
       setShowTicketModal(false);
     } else if (actionData?.status === 500) {
       toast.error("Ticket request failed");
+    } else if (actionData?.status === 400) {
+      toast.error(actionData.error);
     }
   }, [actionData]);
 
