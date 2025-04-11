@@ -49,7 +49,7 @@ export const loader: LoaderFunction = async ({ request }) => {
 
   const { data: profileData, error: profileError } = await supabase
     .from("profiles")
-    .select("id, name, email, avatar_url")
+    .select("id, name, email, avatar_url, is_admin")
     .eq("id", userId);
 
   console.log(profileData, profileError);
@@ -62,6 +62,7 @@ export const loader: LoaderFunction = async ({ request }) => {
         email: user?.email || "",
         name: user?.user_metadata?.name || "",
         avatar_url: user?.user_metadata?.avatar_url,
+        is_admin: false,
       },
     };
   } else {
@@ -72,6 +73,7 @@ export const loader: LoaderFunction = async ({ request }) => {
         name: userInfo?.name,
         email: userInfo?.email,
         avatar_url: userInfo?.avatar_url,
+        is_admin: userInfo?.is_admin,
       },
     };
   }

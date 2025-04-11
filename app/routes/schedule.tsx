@@ -68,7 +68,6 @@ export default function SchedulePage() {
   });
 
   useEffect(() => {
-    console.log("game id", selectedGame?.id);
     if (selectedGame?.id) {
       navigate(`/schedule/${selectedGame.id}`);
     }
